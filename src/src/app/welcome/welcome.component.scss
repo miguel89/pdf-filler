@@ -1,0 +1,17 @@
+.hidden {
+  display: none;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.list-files, .new-upload {
+  min-width: 300px;
+  min-height: 100px;
+  margin: 10px;
+}
+
+.mat-divider {
+  height: 200px;
+}
