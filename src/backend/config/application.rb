@@ -33,5 +33,12 @@ module Backend
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
+
+    CarrierWave.configure do |config|
+      config.storage = :grid_fs
+      config.root = Rails.root.join('tmp')
+      config.cache_dir = 'uploads'
+    end
+
   end
 end
