@@ -1,1 +1,89 @@
-<p>filler works!</p>
+<div fxLayout="row" fxLayoutAlign="space-around start" class="container">
+  <div>
+    <div class="pdf-inputs">
+      <form [formGroup]="form" novalidate>
+        <div *ngFor="let input of textInputList.concat(cbInputList)">
+          <input [name]="input.name"
+                 [type]="input.type.toString()"
+                 [value]="input.value"
+                 [ngStyle]="getInputPosition(input)"
+                 [formControlName]="input.name"
+                 readonly
+                 (click)="pickField(input)">
+        </div>
+      </form>
+
+    </div>
+    <pdf-viewer [src]="pdfSrc" [zoom]="zoom" (after-load-complete)="loadComplete($event)"></pdf-viewer>
+  </div>
+  <div class="main-panel">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>{{document.name}}</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-accordion>
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                Data Input
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <mat-form-field>
+              <textarea matInput placeholder="Paste the CSV here"
+                        [(ngModel)]="dataInput"
+                        (blur)="loadDataInputFields()"></textarea>
+            </mat-form-field>
+          </mat-expansion-panel>
+
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                Input Data Fields
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <mat-chip-list aria-label="Data Fields" *ngIf="dataInputFields != null">
+              <mat-chip *ngFor="let ti of dataInputFields" cdkDrag>{{ti}}</mat-chip>
+            </mat-chip-list>
+
+          </mat-expansion-panel>
+
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                PDF Inputs
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <mat-chip-list aria-label="Input List" *ngIf="textInputList != null">
+              <mat-chip *ngFor="let ti of textInputList" cdkDrag>{{ti.name}}</mat-chip>
+            </mat-chip-list>
+
+          </mat-expansion-panel>
+
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                PDF Checkboxes
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <mat-chip-list aria-label="Checkbox List" *ngIf="cbInputList != null">
+              <mat-chip *ngFor="let cbi of textInputList">{{cbi.name}}</mat-chip>
+            </mat-chip-list>
+
+          </mat-expansion-panel>
+        </mat-accordion>
+      </mat-card-content>
+
+      <mat-card-actions fxLayout="row" fxLayoutAlign="space-around center">
+        <button mat-button>SAVE</button>
+        <button mat-button>DOWNLOAD</button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+
+</div>

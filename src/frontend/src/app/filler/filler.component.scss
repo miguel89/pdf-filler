@@ -1,0 +1,17 @@
+.container {
+  margin: 2em;
+}
+
+.pdf-inputs {
+  position: absolute;
+  z-index: 1;
+  & input {
+    position: absolute;
+    background-color: wheat;
+    border: none;
+  }
+}
+
+.main-panel {
+  height: 100%;
+}
