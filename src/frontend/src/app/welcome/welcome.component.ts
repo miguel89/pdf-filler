@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { DocumentService } from '../document.service';
 import { Document } from '../document';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-welcome',
@@ -11,8 +12,9 @@ export class WelcomeComponent implements OnInit {
 
   public loadingDocs: boolean;
   public docsList: Document[];
+  public uploading: boolean;
 
-  constructor(private documentService: DocumentService) {
+  constructor(private documentService: DocumentService, private router: Router) {
     this.docsList = [];
   }
 
@@ -25,6 +27,22 @@ export class WelcomeComponent implements OnInit {
       console.error(err);
       this.loadingDocs = false;
     });
+  }
+
+  openDocument(docId: string): void {
+    this.router.navigate([`/document/${docId}`]);
+  }
+
+  handleFileInput(files: FileList) {
+    const file = files.item(0);
+
+    this.uploading = true;
+    this.documentService.upload(file).subscribe(resp => this.openDocument(resp.id),
+      err => {
+        console.error(err);
+        this.uploading = false;
+      }, () => this.uploading = false);
+
   }
 
 }

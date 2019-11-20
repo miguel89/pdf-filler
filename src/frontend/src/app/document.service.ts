@@ -20,8 +20,13 @@ export class DocumentService {
     return this.http.get<Document>(`${environment.server}/pdf_documents/${id}`);
   }
 
-  createDocument(document: Document): Observable<Document> {
-    return this.http.post<Document>(`${environment.server}/pdf_documents`, document);
+  upload(file: File): Observable<Document> {
+    const formData: FormData = new FormData();
+
+    formData.append('pdf', file, file.name);
+
+    return this.http.post<Document>(`${environment.server}/pdf_documents/new/upload`,
+      formData);
   }
 
   listEntries(documentId: string): Observable<Entry[]> {
