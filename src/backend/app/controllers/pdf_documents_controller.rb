@@ -1,5 +1,5 @@
 class PdfDocumentsController < ApplicationController
-  before_action :set_document, only: [:show, :update, :destroy, :upload, :get_pdf]
+  before_action :set_document, only: %i[show update destroy download]
 
   # GET /documents
   def index
@@ -39,10 +39,16 @@ class PdfDocumentsController < ApplicationController
   end
 
   def upload
-    @pdf_document.file = params[:pdf]
-    @pdf_document.save!
-    puts @pdf_document.file.url
-    puts @pdf_document.file.current_path
+    pdf_document = PdfDocument.new
+
+    pdf_document.file = params[:pdf]
+    pdf_document.name = params[:pdf].original_filename.split('.')[0..-2].join
+
+    if pdf_document.save
+      render json: pdf_document, status: :created, location: pdf_document
+    else
+      render json: pdf_document.errors, status: :unprocessable_entity
+    end
   end
 
   def download
@@ -55,13 +61,14 @@ class PdfDocumentsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_document
-      @pdf_document = PdfDocument.find(params[:id])
-    end
 
-    # Only allow a trusted parameter "white list" through.
-    def document_params
-      params.require(:pdf_document).permit(:name, :file)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_document
+    @pdf_document = PdfDocument.find(params[:id])
+  end
+
+  # Only allow a trusted parameter "white list" through.
+  def document_params
+    params.require(:pdf_document).permit(:name, :file)
+  end
 end
