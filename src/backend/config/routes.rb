@@ -1,6 +1,8 @@
 Rails.application.routes.draw do
   resources :pdf_documents do
-    resources :entries
+    resources :entries do
+      post :batch_create, on: :new
+    end
     get :download, on: :member
     post :upload, on: :new
   end

@@ -1,11 +1,9 @@
 class EntriesController < ApplicationController
-  before_action :set_entry, only: [:show, :update, :destroy]
+  before_action :set_entry, only: %i[show update destroy]
 
   # GET /entries
   def index
-    @entries = Entry.all
-
-    render json: @entries
+    render json: PdfDocument.find(params[:pdf_document_id]).entries
   end
 
   # GET /entries/1
@@ -23,6 +21,23 @@ class EntriesController < ApplicationController
     else
       render json: @entry.errors, status: :unprocessable_entity
     end
+  end
+
+  # POST /entries
+  def batch_create
+    entries = []
+    document = PdfDocument.find(params[:pdf_document_id])
+
+    document.entries.destroy_all
+
+    params[:entries].each do |it|
+      entry = Entry.new(it.permit(:key, :value, :literal))
+      entry.pdf_document = document
+      entry.save
+      entries << entry
+    end
+
+    render json: entries, status: :created
   end
 
   # PATCH/PUT /entries/1

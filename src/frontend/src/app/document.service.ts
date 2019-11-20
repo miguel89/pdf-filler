@@ -29,12 +29,17 @@ export class DocumentService {
       formData);
   }
 
+  update(document: Document): Observable<Document> {
+    return this.http.put<Document>(`${environment.server}/pdf_documents/${document.id}`, document);
+  }
+
   listEntries(documentId: string): Observable<Entry[]> {
     return this.http.get<Entry[]>(`${environment.server}/pdf_documents/${documentId}/entries`);
   }
 
-  addEntry(documentId: string, entry: Entry): Observable<Entry> {
-    return this.http.post<Entry>(`${environment.server}/pdf_documents/${documentId}/entries`, entry);
+  saveEntries(documentId: string, entryList: Entry[]): Observable<Entry> {
+    return this.http.post<Entry>(`${environment.server}/pdf_documents/${documentId}/entries/new/batch_create`,
+      { entries: entryList });
   }
 
 }

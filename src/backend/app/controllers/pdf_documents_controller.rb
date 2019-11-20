@@ -69,6 +69,6 @@ class PdfDocumentsController < ApplicationController
 
   # Only allow a trusted parameter "white list" through.
   def document_params
-    params.require(:pdf_document).permit(:name, :file)
+    params.require(:pdf_document).permit(:name, :dataFields => [])
   end
 end

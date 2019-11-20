@@ -9,8 +9,9 @@ import { Input } from './input';
 import { InputType } from './input-type';
 import { PDFAnnotationData } from 'pdfjs-dist';
 import { MatDialog } from '@angular/material/dialog';
-import { DialogData, SelectionDialogComponent } from './selection-dialog/selection-dialog.component';
+import { SelectionDialogComponent } from './selection-dialog/selection-dialog.component';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { Entry } from '../entry';
 
 @Component({
   selector: 'app-filler',
@@ -30,9 +31,7 @@ export class FillerComponent implements OnInit {
   public cbInputList: Input[];
 
   public dataInput: string;
-  public dataInputFields: string[];
 
-  public selection: Map<string, string>;
   public form: FormGroup;
 
   public zoom = 1;
@@ -47,8 +46,6 @@ export class FillerComponent implements OnInit {
     this.document = new Document();
     this.textInputList = [];
     this.cbInputList = [];
-    this.dataInputFields = [];
-    this.selection = new Map<string, string>();
     this.form = this.fb.group({});
   }
 
@@ -65,6 +62,29 @@ export class FillerComponent implements OnInit {
         this.loading = false;
       },
       () => this.loading = false);
+  }
+
+  save(): void {
+    this.documentService.update(this.document).pipe(
+      switchMap((value, index) => {
+        this.document.entries = [];
+        const values = this.form.value;
+        for (let _key in values) {
+          this.document.entries.push({ key: _key, value: values[_key], literal: false } as Entry);
+        }
+
+        return this.documentService.saveEntries(this.document.id, this.document.entries);
+      })
+    ).subscribe(resp => {
+      this.loading = false;
+    }, err => {
+      console.error(err);
+      this.loading = false;
+    });
+  }
+
+  download() {
+    // this.pdfProxy
   }
 
   get pdfSrc() {
@@ -85,6 +105,8 @@ export class FillerComponent implements OnInit {
 
         p.getAnnotations().then((annotations: any) => {
           annotations.filter(a => a.subtype === 'Widget').forEach(a => {
+            a.fieldValue = 'test';
+            console.log(a);
 
             const fieldRect = currentPage.getViewport({scale: this.DPI_RATIO})
               .convertToViewportRectangle(a.rect);
@@ -143,16 +165,15 @@ export class FillerComponent implements OnInit {
   pickField(input: Input): void {
     this.dialog.open(SelectionDialogComponent, {
       width: '250px',
-      data: { name: input.name, fields: this.dataInputFields}
+      data: { name: input.name, fields: this.document.dataFields}
     }).afterClosed().subscribe(resp => {
       if (resp !== '_cancelled') {
-        this.selection.set(input.name, resp);
         this.form.get(input.name).setValue(resp);
       }
     });
   }
 
-  loadDataInputFields() {
-    this.dataInputFields = this.dataInput.split('\n')[0].split(',');
+  loadDataInputFields(event) {
+    this.document.dataFields = event.target.value.split('\n')[0].split(',');
   }
 }

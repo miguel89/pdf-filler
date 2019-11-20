@@ -26,14 +26,13 @@
           <mat-expansion-panel>
             <mat-expansion-panel-header>
               <mat-panel-title>
-                Data Input
+                Data Fields Input
               </mat-panel-title>
             </mat-expansion-panel-header>
 
             <mat-form-field>
-              <textarea matInput placeholder="Paste the CSV here"
-                        [(ngModel)]="dataInput"
-                        (blur)="loadDataInputFields()"></textarea>
+              <textarea matInput placeholder="Paste the CSV here with the field names"
+                        (blur)="loadDataInputFields($event)"></textarea>
             </mat-form-field>
           </mat-expansion-panel>
 
@@ -44,8 +43,8 @@
               </mat-panel-title>
             </mat-expansion-panel-header>
 
-            <mat-chip-list aria-label="Data Fields" *ngIf="dataInputFields != null">
-              <mat-chip *ngFor="let ti of dataInputFields" cdkDrag>{{ti}}</mat-chip>
+            <mat-chip-list aria-label="Data Fields" *ngIf="document.dataFields != null">
+              <mat-chip *ngFor="let ti of document.dataFields" cdkDrag>{{ti}}</mat-chip>
             </mat-chip-list>
 
           </mat-expansion-panel>
@@ -75,11 +74,24 @@
             </mat-chip-list>
 
           </mat-expansion-panel>
+
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                Data Input
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <mat-form-field>
+              <textarea matInput placeholder="Paste the CSV here with the values"
+                        [(ngModel)]="dataInput"></textarea>
+            </mat-form-field>
+          </mat-expansion-panel>
         </mat-accordion>
       </mat-card-content>
 
       <mat-card-actions fxLayout="row" fxLayoutAlign="space-around center">
-        <button mat-button>SAVE</button>
+        <button mat-button (click)="save()">SAVE</button>
         <button mat-button>DOWNLOAD</button>
       </mat-card-actions>
     </mat-card>
