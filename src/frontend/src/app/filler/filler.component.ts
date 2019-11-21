@@ -157,12 +157,13 @@ export class FillerComponent implements OnInit {
       input.position.width = (rect[2] - rect[0]);
     }
 
-    const entry = this.document.entries.find(it => it.key === annotation.fieldName);
-    if (entry != null) {
-      formControl.setValue(entry.value);
-      input.value = entry.value;
+    if (this.document.entries != null) {
+      const entry = this.document.entries.find(it => it.key === annotation.fieldName);
+      if (entry != null) {
+        formControl.setValue(entry.value);
+        input.value = entry.value;
+      }
     }
-
     this.form.addControl(annotation.fieldName, formControl);
   }
 
