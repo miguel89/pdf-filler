@@ -1,11 +1,14 @@
 require 'pdf_forms'
 require 'csv'
+require 'zip'
 
 class PdfDocumentsController < ApplicationController
   before_action :set_document, only: %i[show update destroy download fill]
 
+  PDFTK_PATH = '/usr/bin/pdftk'
   ORIGINAL_FILE_NAME = 'original.pdf'
-  RESULT_FILE_NAME = 'result.pdf'
+  RESULT_FILE_NAME = "result_%s.pdf"
+  FINAL_FILE_NAME = 'final.zip'
 
   # GET /documents
   def index
@@ -69,40 +72,74 @@ class PdfDocumentsController < ApplicationController
   def fill
     data = CSV.parse(@pdf_document.data, headers: true)
 
-    original = File.new(ORIGINAL_FILE_NAME, 'w')
-    original.set_encoding('ASCII-8BIT')
-    original.write(@pdf_document.file.read)
+    original = save_into_disk(@pdf_document.file.read, ORIGINAL_FILE_NAME)
+    result_file_names = []
 
-    data.each do |row|
-      create_pdf(original, row.to_h)
+    data.each_with_index do |row, idx|
+      result_file_names << create_pdf(original, row.to_h, idx)
     end
 
-    result = File.open(RESULT_FILE_NAME, 'r')
+    result = create_final_or_zip(result_file_names)
     content = result.nil? ? nil : result.read
+    ct = content_type(result)
 
     if stale?(etag: content, public: true)
-      send_data content, type: @pdf_document.file.file.content_type, disposition: 'inline'
+      send_data content,
+                type: ct, disposition: 'inline', filename: 'pdf_complete.zip'
       expires_in 0, public: true
     end
 
-    result&.close
+  ensure
     original.close
-
+    result&.close
     File.delete(ORIGINAL_FILE_NAME) if File.exist?(ORIGINAL_FILE_NAME)
-    File.delete(RESULT_FILE_NAME) if File.exist?(RESULT_FILE_NAME)
+    File.delete(FINAL_FILE_NAME) if File.exist?(FINAL_FILE_NAME)
   end
 
   private
 
-  def create_pdf(original, data)
-    pdftk = PdfForms.new('/usr/bin/pdftk')
+  def save_into_disk(content, file_name)
+    file = File.new(file_name, 'w')
+    file.set_encoding('ASCII-8BIT')
+    file.write(content)
+    file.close
+
+    File.open(ORIGINAL_FILE_NAME, 'r')
+  end
+
+  def create_pdf(original, data, idx)
+    pdftk = PdfForms.new(PDFTK_PATH)
+    file_name = RESULT_FILE_NAME % idx
     replace = {}
 
     @pdf_document.entries.each do |entry|
       replace[entry.key] = data[entry.value] if data[entry.value]
     end
 
-    pdftk.fill_form original, RESULT_FILE_NAME, replace, :flatten => true
+    pdftk.fill_form original, file_name, replace, flatten: true
+
+    file_name
+  end
+
+  def create_final_or_zip(file_names)
+    Zip::File.open(FINAL_FILE_NAME, Zip::File::CREATE) do |zipfile|
+      file_names.each do |filename|
+        zipfile.add(filename, File.open(filename, 'r'))
+      end
+    end
+    file_names.each do |filename|
+      File.delete(filename) if File.exist?(filename)
+    end
+
+    File.open(FINAL_FILE_NAME, 'r')
+  end
+
+  def content_type(file)
+    if file.path.split('.')[-1] == 'pdf'
+      'application/pdf'
+    else
+      'application/zip'
+    end
   end
 
   # Use callbacks to share common setup or constraints between actions.
@@ -112,6 +149,6 @@ class PdfDocumentsController < ApplicationController
 
   # Only allow a trusted parameter "white list" through.
   def document_params
-    params.require(:pdf_document).permit(:name, :data, :dataFields => [])
+    params.require(:pdf_document).permit(:name, :data, dataFields: [])
   end
 end

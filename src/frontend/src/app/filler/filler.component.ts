@@ -89,6 +89,12 @@ export class FillerComponent implements OnInit {
     return `${environment.server}/pdf_documents/${this.document.id}/fill`;
   }
 
+  loadSavedFields() {
+    this.document.entries.forEach((it: Entry) => {
+      this.form.controls[it.key].setValue(it.value);
+    });
+  }
+
   get pdfSrc() {
     return `${environment.server}/pdf_documents/${this.document.id}/download`;
   }
@@ -121,6 +127,7 @@ export class FillerComponent implements OnInit {
   private addInput(annotation: PDFAnnotationData | any, rect: number[], page: number): void {
     const formControl = new FormControl(annotation.buttonValue || '');
     const input = new Input();
+
     input.name = annotation.fieldName;
 
     if (annotation.fieldType === 'Tx') {
@@ -150,6 +157,12 @@ export class FillerComponent implements OnInit {
       input.position.width = (rect[2] - rect[0]);
     }
 
+    const entry = this.document.entries.find(it => it.key === annotation.fieldName);
+    if (entry != null) {
+      formControl.setValue(entry.value);
+      input.value = entry.value;
+    }
+
     this.form.addControl(annotation.fieldName, formControl);
   }
 
@@ -164,7 +177,7 @@ export class FillerComponent implements OnInit {
 
   pickField(input: Input): void {
     this.dialog.open(SelectionDialogComponent, {
-      width: '250px',
+      width: '500px',
       data: { name: input.name, fields: this.document.dataFields}
     }).afterClosed().subscribe(resp => {
       if (resp !== '_cancelled') {

@@ -31,7 +31,8 @@
             </mat-expansion-panel-header>
 
             <mat-form-field>
-              <textarea matInput placeholder="Paste the CSV here with the field names"
+              <textarea matInput
+                        placeholder="Paste the CSV here with the field names"
                         (blur)="loadDataInputFields($event)"></textarea>
             </mat-form-field>
           </mat-expansion-panel>
@@ -49,31 +50,31 @@
 
           </mat-expansion-panel>
 
-          <mat-expansion-panel>
-            <mat-expansion-panel-header>
-              <mat-panel-title>
-                PDF Inputs
-              </mat-panel-title>
-            </mat-expansion-panel-header>
+<!--          <mat-expansion-panel>-->
+<!--            <mat-expansion-panel-header>-->
+<!--              <mat-panel-title>-->
+<!--                PDF Inputs-->
+<!--              </mat-panel-title>-->
+<!--            </mat-expansion-panel-header>-->
 
-            <mat-chip-list aria-label="Input List" *ngIf="textInputList != null">
-              <mat-chip *ngFor="let ti of textInputList" cdkDrag>{{ti.name}}</mat-chip>
-            </mat-chip-list>
+<!--            <mat-chip-list aria-label="Input List" *ngIf="textInputList != null">-->
+<!--              <mat-chip *ngFor="let ti of textInputList" cdkDrag>{{ti.name}}</mat-chip>-->
+<!--            </mat-chip-list>-->
 
-          </mat-expansion-panel>
+<!--          </mat-expansion-panel>-->
 
-          <mat-expansion-panel>
-            <mat-expansion-panel-header>
-              <mat-panel-title>
-                PDF Checkboxes
-              </mat-panel-title>
-            </mat-expansion-panel-header>
+<!--          <mat-expansion-panel>-->
+<!--            <mat-expansion-panel-header>-->
+<!--              <mat-panel-title>-->
+<!--                PDF Checkboxes-->
+<!--              </mat-panel-title>-->
+<!--            </mat-expansion-panel-header>-->
 
-            <mat-chip-list aria-label="Checkbox List" *ngIf="cbInputList != null">
-              <mat-chip *ngFor="let cbi of textInputList">{{cbi.name}}</mat-chip>
-            </mat-chip-list>
+<!--            <mat-chip-list aria-label="Checkbox List" *ngIf="cbInputList != null">-->
+<!--              <mat-chip *ngFor="let cbi of textInputList">{{cbi.name}}</mat-chip>-->
+<!--            </mat-chip-list>-->
 
-          </mat-expansion-panel>
+<!--          </mat-expansion-panel>-->
 
           <mat-expansion-panel>
             <mat-expansion-panel-header>
@@ -83,7 +84,8 @@
             </mat-expansion-panel-header>
 
             <mat-form-field>
-              <textarea matInput placeholder="Paste the CSV here with the values"
+              <textarea matInput rows="4" cols="500"
+                        placeholder="Paste the CSV here with the values"
                         [(ngModel)]="document.data"></textarea>
             </mat-form-field>
           </mat-expansion-panel>

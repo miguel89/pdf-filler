@@ -1,24 +1,8 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+# Dependencies
 
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+* rails 6.0.1
+* mongodb
+* [pdftk](https://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/)
+ * [bcprv](https://www.bouncycastle.org/java.html) (optional, for encrypted PDF files)

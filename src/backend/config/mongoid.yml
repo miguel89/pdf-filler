@@ -162,3 +162,21 @@ test:
         read:
           mode: :primary
         max_pool_size: 1
+
+production:
+  clients:
+    default:
+      database: pdf-filler
+      hosts:
+        - mongo:27017
+      options:
+        user: 'root'
+        password: 'root'
+        roles:
+          - 'dbOwner'
+        # Change the default authentication mechanism. Valid options are: :scram,
+        # :mongodb_cr, :mongodb_x509, and :plain. (default on 3.0 is :scram, default
+        # on 2.4 and 2.6 is :plain)
+        # auth_mech: :scram
+        # The database or source to authenticate the user against. (default: admin)
+        auth_source: admin
