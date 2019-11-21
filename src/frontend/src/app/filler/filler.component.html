@@ -84,7 +84,7 @@
 
             <mat-form-field>
               <textarea matInput placeholder="Paste the CSV here with the values"
-                        [(ngModel)]="dataInput"></textarea>
+                        [(ngModel)]="document.data"></textarea>
             </mat-form-field>
           </mat-expansion-panel>
         </mat-accordion>
@@ -92,10 +92,11 @@
 
       <mat-card-actions fxLayout="row" fxLayoutAlign="space-around center">
         <button mat-button (click)="save()">SAVE</button>
-        <button mat-button>DOWNLOAD</button>
+        <a mat-button [href]="download()">DOWNLOAD</a>
       </mat-card-actions>
     </mat-card>
   </div>
 
 
 </div>
+<a class="hidden" #downloadZipLink></a>

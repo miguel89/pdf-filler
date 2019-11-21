@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { DocumentService } from '../document.service';
 import { Document } from '../document';
@@ -37,6 +37,8 @@ export class FillerComponent implements OnInit {
   public zoom = 1;
 
   public InputType = InputType;
+
+  // @ViewChild('downloadZipLink') private downloadZipLink: ElementRef;
 
   constructor(private route: ActivatedRoute,
               private router: Router,
@@ -84,7 +86,23 @@ export class FillerComponent implements OnInit {
   }
 
   download() {
-    // this.pdfProxy
+    return `${environment.server}/pdf_documents/${this.document.id}/fill`;
+    // this.documentService.download(this.document.id, this.dataInput).subscribe(
+    //   resp => {
+    //     const blob = new Blob([resp], { type: 'application/pdf' });
+    //     const url = window.URL.createObjectURL(blob);
+    //
+    //     const link = this.downloadZipLink.nativeElement;
+    //     link.href = url;
+    //     link.download = 'archive.zip';
+    //     link.click();
+    //
+    //     window.URL.revokeObjectURL(url);
+    //   }, err => {
+    //     console.error(err);
+    //     this.loading = false;
+    //   }, () => this.loading = false
+    // );
   }
 
   get pdfSrc() {

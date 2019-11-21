@@ -5,5 +5,6 @@ export class Document {
   public name: string;
   public file: any;
   public dataFields: string[];
+  public data: string;
   public entries: Entry[];
 }

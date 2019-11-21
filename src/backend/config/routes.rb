@@ -4,6 +4,7 @@ Rails.application.routes.draw do
       post :batch_create, on: :new
     end
     get :download, on: :member
+    get :fill, on: :member
     post :upload, on: :new
   end
 

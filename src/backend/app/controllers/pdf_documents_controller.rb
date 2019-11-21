@@ -1,5 +1,11 @@
+require 'pdf_forms'
+require 'csv'
+
 class PdfDocumentsController < ApplicationController
-  before_action :set_document, only: %i[show update destroy download]
+  before_action :set_document, only: %i[show update destroy download fill]
+
+  ORIGINAL_FILE_NAME = 'original.pdf'
+  RESULT_FILE_NAME = 'result.pdf'
 
   # GET /documents
   def index
@@ -60,7 +66,44 @@ class PdfDocumentsController < ApplicationController
     end
   end
 
+  def fill
+    data = CSV.parse(@pdf_document.data, headers: true)
+
+    original = File.new(ORIGINAL_FILE_NAME, 'w')
+    original.set_encoding('ASCII-8BIT')
+    original.write(@pdf_document.file.read)
+
+    data.each do |row|
+      create_pdf(original, row.to_h)
+    end
+
+    result = File.open(RESULT_FILE_NAME, 'r')
+    content = result.nil? ? nil : result.read
+
+    if stale?(etag: content, public: true)
+      send_data content, type: @pdf_document.file.file.content_type, disposition: 'inline'
+      expires_in 0, public: true
+    end
+
+    result&.close
+    original.close
+
+    File.delete(ORIGINAL_FILE_NAME) if File.exist?(ORIGINAL_FILE_NAME)
+    File.delete(RESULT_FILE_NAME) if File.exist?(RESULT_FILE_NAME)
+  end
+
   private
+
+  def create_pdf(original, data)
+    pdftk = PdfForms.new('/usr/bin/pdftk')
+    replace = {}
+
+    @pdf_document.entries.each do |entry|
+      replace[entry.key] = data[entry.key] if data[entry.key]
+    end
+
+    pdftk.fill_form original, RESULT_FILE_NAME, replace, :flatten => true
+  end
 
   # Use callbacks to share common setup or constraints between actions.
   def set_document
@@ -69,6 +112,6 @@ class PdfDocumentsController < ApplicationController
 
   # Only allow a trusted parameter "white list" through.
   def document_params
-    params.require(:pdf_document).permit(:name, :dataFields => [])
+    params.require(:pdf_document).permit(:name, :data, :dataFields => [])
   end
 end

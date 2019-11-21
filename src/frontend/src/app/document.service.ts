@@ -42,4 +42,9 @@ export class DocumentService {
       { entries: entryList });
   }
 
+  download(documentId: string, _data: string): Observable<Blob> {
+    return this.http.post<Blob>(`${environment.server}/pdf_documents/${documentId}/fill`,
+      { data: _data });
+  }
+
 }
