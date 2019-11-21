@@ -87,22 +87,6 @@ export class FillerComponent implements OnInit {
 
   download() {
     return `${environment.server}/pdf_documents/${this.document.id}/fill`;
-    // this.documentService.download(this.document.id, this.dataInput).subscribe(
-    //   resp => {
-    //     const blob = new Blob([resp], { type: 'application/pdf' });
-    //     const url = window.URL.createObjectURL(blob);
-    //
-    //     const link = this.downloadZipLink.nativeElement;
-    //     link.href = url;
-    //     link.download = 'archive.zip';
-    //     link.click();
-    //
-    //     window.URL.revokeObjectURL(url);
-    //   }, err => {
-    //     console.error(err);
-    //     this.loading = false;
-    //   }, () => this.loading = false
-    // );
   }
 
   get pdfSrc() {
@@ -123,8 +107,6 @@ export class FillerComponent implements OnInit {
 
         p.getAnnotations().then((annotations: any) => {
           annotations.filter(a => a.subtype === 'Widget').forEach(a => {
-            a.fieldValue = 'test';
-            console.log(a);
 
             const fieldRect = currentPage.getViewport({scale: this.DPI_RATIO})
               .convertToViewportRectangle(a.rect);
@@ -186,7 +168,7 @@ export class FillerComponent implements OnInit {
       data: { name: input.name, fields: this.document.dataFields}
     }).afterClosed().subscribe(resp => {
       if (resp !== '_cancelled') {
-        this.form.get(input.name).setValue(resp);
+        this.form.controls[input.name].setValue(resp);
       }
     });
   }

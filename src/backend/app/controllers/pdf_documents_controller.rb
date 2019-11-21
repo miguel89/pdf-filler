@@ -99,7 +99,7 @@ class PdfDocumentsController < ApplicationController
     replace = {}
 
     @pdf_document.entries.each do |entry|
-      replace[entry.key] = data[entry.key] if data[entry.key]
+      replace[entry.key] = data[entry.value] if data[entry.value]
     end
 
     pdftk.fill_form original, RESULT_FILE_NAME, replace, :flatten => true
